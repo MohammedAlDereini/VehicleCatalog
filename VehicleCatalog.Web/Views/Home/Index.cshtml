@@ -1,0 +1,151 @@
+@model VehicleSearchViewModel
+@{
+    ViewData["Title"] = "Search";
+    var selectedType = Model.SelectedVehicleType;
+}
+
+<section class="search-panel">
+    <h1>Find vehicle types &amp; models</h1>
+    <p class="lead">Choose a car make and a manufacture year to see the available vehicle types and models.</p>
+
+    <form method="get" asp-controller="Home" asp-action="Index" class="search-form" id="searchForm">
+        <div class="field">
+            <label for="makeSelect">Make</label>
+            <div class="combobox" data-combobox>
+                <select id="makeSelect" name="makeId" required aria-label="Car make" class="combobox-native">
+                    <option value="" disabled selected hidden>Select a make…</option>
+                    @foreach (var make in Model.Makes)
+                    {
+                        if (Model.SelectedMakeId == make.Id)
+                        {
+                            <option value="@make.Id" selected>@make.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@make.Id">@make.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="field field-year">
+            <label for="year">Manufacture year</label>
+            <select id="year" name="year" required aria-label="Manufacture year">
+                <option value="" disabled selected hidden>Year…</option>
+                @foreach (var year in Model.Years)
+                {
+                    if (Model.SelectedYear == year)
+                    {
+                        <option value="@year" selected>@year</option>
+                    }
+                    else
+                    {
+                        <option value="@year">@year</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="field field-submit">
+            <button type="submit" class="btn-primary">Show results</button>
+        </div>
+    </form>
+
+    @if (Model.Makes.Count == 0 && string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <p class="hint">No makes are available right now.</p>
+    }
+</section>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-error" role="alert">
+        <strong>Service unavailable.</strong> @Model.ErrorMessage
+    </div>
+}
+
+@if (Model.HasSearched && string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <section class="results">
+        <h2 class="results-title">
+            Results for <span class="highlight">@(Model.SelectedMakeName ?? $"Make #{Model.SelectedMakeId}")</span>
+            &middot; <span class="highlight">@Model.SelectedYear</span>
+        </h2>
+
+        <div class="results-grid">
+            <article class="card">
+                <h3>Vehicle types <span class="count">@Model.VehicleTypes.Count</span></h3>
+                <p class="card-hint">Select a type to filter the models list.</p>
+
+                <div class="chips">
+                    <a class="chip @(selectedType is null ? "chip-active" : null)"
+                       asp-action="Index"
+                       asp-route-makeId="@Model.SelectedMakeId"
+                       asp-route-year="@Model.SelectedYear">All types</a>
+
+                    @foreach (var type in Model.VehicleTypes)
+                    {
+                        var isActive = selectedType is not null
+                            && string.Equals(selectedType, type.Name, StringComparison.OrdinalIgnoreCase);
+                        <a class="chip @(isActive ? "chip-active" : null)"
+                           asp-action="Index"
+                           asp-route-makeId="@Model.SelectedMakeId"
+                           asp-route-year="@Model.SelectedYear"
+                           asp-route-vehicleType="@type.Name">@type.Name</a>
+                    }
+                </div>
+
+                @if (Model.VehicleTypes.Count == 0)
+                {
+                    <p class="empty">No vehicle types reported for this make.</p>
+                }
+            </article>
+
+            <article class="card">
+                <h3>
+                    Models <span class="count">@Model.Models.Count</span>
+                    @if (selectedType is not null)
+                    {
+                        <span class="filter-note">filtered by “@selectedType”</span>
+                    }
+                </h3>
+
+                @if (Model.Models.Count == 0)
+                {
+                    <p class="empty">No models found for the selected criteria.</p>
+                }
+                else
+                {
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="num">#</th>
+                                <th scope="col">Model</th>
+                                <th scope="col" class="num">Model ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var index = 1;
+                            }
+                            @foreach (var vehicleModel in Model.Models)
+                            {
+                                <tr>
+                                    <td class="num">@index</td>
+                                    <td>@vehicleModel.Name</td>
+                                    <td class="num">@vehicleModel.Id</td>
+                                </tr>
+                                index++;
+                            }
+                        </tbody>
+                    </table>
+                }
+            </article>
+        </div>
+    </section>
+}
+
+@section Scripts {
+    <script src="~/js/site.js" asp-append-version="true"></script>
+}

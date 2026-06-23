@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Vehicle Catalog</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <a class="brand" asp-controller="Home" asp-action="Index">
+                <span class="brand-mark">🚗</span>
+                <span class="brand-text">Vehicle Catalog</span>
+            </a>
+            <span class="brand-sub">Make &amp; year &rarr; vehicle types &amp; models</span>
+        </div>
+    </header>
+
+    <main class="container" role="main">
+        @RenderBody()
+    </main>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
