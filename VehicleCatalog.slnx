@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="VehicleCatalog.Web/VehicleCatalog.Web.csproj" />
+  <Project Path="VehicleCatalog.Handler/VehicleCatalog.Handler.csproj" />
+</Solution>
